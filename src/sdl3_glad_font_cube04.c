@@ -17,8 +17,6 @@ W: Rotate cube positively around Y-axis.
 S: Rotate cube negatively around Y-axis.
 E: Rotate cube positively around Z-axis.
 D: Rotate cube negatively around Z-axis.
-
-
 */
 
 // FontData and CubeData structures (unchanged)

@@ -183,7 +183,7 @@ set(SRC_FILES
     # Add other .c files here if necessary
     src/gl.c                    # glad 2.0.8
     src/module_font.c           # font
-
+    src/module_cube.c           # font
 )
 
 message(STATUS "cimgui_SOURCE_DIR: >> ${cimgui_SOURCE_DIR}")

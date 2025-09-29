@@ -4,11 +4,11 @@
 #include <stdlib.h>
 #include <SDL3/SDL.h>
 #include <glad/gl.h>
-
+#include <cglm/cglm.h> // Added for CGLM matrix operations
 #include <cimgui.h>
 #include <cimgui_impl.h>
-
 #include "module_font.h"
+#include "module_cube.h" // Added for cube functionality
 
 #define igGetIO igGetIO_Nil
 
@@ -66,7 +66,7 @@ int main() {
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-
+    // Initialize font
     FontData *font_data = NULL;
     if (!init_font("resources/Kenney Mini.ttf", 32.0f, main_scale, &font_data)) {
         SDL_GL_DestroyContext(gl_context);
@@ -75,9 +75,9 @@ int main() {
         return -1;
     }
 
-    // Initialize shaders and buffers
-    GLuint program, vao, vbo;
-    if (!init_font_shaders_and_buffers(&program, &vao, &vbo)) {
+    // Initialize font shaders and buffers
+    GLuint text_program, text_vao, text_vbo;
+    if (!init_font_shaders_and_buffers(&text_program, &text_vao, &text_vbo)) {
         cleanup_font(font_data);
         SDL_GL_DestroyContext(gl_context);
         SDL_DestroyWindow(window);
@@ -85,6 +85,31 @@ int main() {
         return -1;
     }
 
+    // Initialize cube data and shaders
+    CubeData cube_data = {0};
+    if (!init_cube("resources/ph16.png", &cube_data)) { // Replace with your texture path
+        printf("Error: Failed to initialize cube\n");
+        cleanup_font(font_data);
+        SDL_GL_DestroyContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+    GLuint cube_program;
+    if (!init_cube_shaders_and_buffers(&cube_program)) {
+        printf("Error: Failed to initialize cube shaders\n");
+        glDeleteTextures(1, &cube_data.texture);
+        glDeleteVertexArrays(1, &cube_data.vao);
+        glDeleteBuffers(1, &cube_data.vbo);
+        cleanup_font(font_data);
+        SDL_GL_DestroyContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
+    // Enable depth testing for cube rendering
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -92,6 +117,7 @@ int main() {
     bool show_demo_window = true;
     bool show_another_window = false;
     ImVec4 clear_color = {0.45f, 0.55f, 0.60f, 1.00f};
+    float rotation[3] = {0.0f, 0.0f, 0.0f}; // Cube rotation angles
 
     // Main loop
     bool done = false;
@@ -148,27 +174,39 @@ int main() {
             igEnd();
         }
 
-        // end imgui Rendering
+        // Update cube rotation
+        rotation[0] += 0.5f; // Rotate around X axis
+        rotation[1] += 0.7f; // Rotate around Y axis
+        // rotation[2] += 0.3f; // Optional: Rotate around Z axis
+
+        // End ImGui Rendering
         igRender();
 
         int ww, hh;
         SDL_GetWindowSize(window, &ww, &hh);
         glViewport(0, 0, ww, hh);
-        // glViewport(0, 0, (int)io->DisplaySize.x, (int)io->DisplaySize.y);
-
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Added depth buffer clear
 
-        // render 2d text
-        render_text(font_data, program, vao, vbo, "Hello, World!", 100.0f, 100.0f, 800, 600, 1.0f, 1.0f, 1.0f, 1.0f);
+        // Render cube
+        render_cube(&cube_data, cube_program, rotation, ww, hh);
 
+        // Render 2D text (after cube to ensure text is on top)
+        render_text(font_data, text_program, text_vao, text_vbo, "Hello, World!", 100.0f, 100.0f, ww, hh, 1.0f, 1.0f, 1.0f, 1.0f);
 
+        // Render ImGui
         ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
         SDL_GL_SwapWindow(window);
     }
 
     // Cleanup
-    cleanup_font(font_data); // conflict due cimgui modified font match data type.
+    // Clean up cube resources
+    glDeleteTextures(1, &cube_data.texture);
+    glDeleteVertexArrays(1, &cube_data.vao);
+    glDeleteBuffers(1, &cube_data.vbo);
+    glDeleteProgram(cube_program);
+
+    cleanup_font(font_data);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();

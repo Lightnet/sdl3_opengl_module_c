@@ -22,3 +22,16 @@ void render_text_alt(GLuint program, GLuint vao, GLuint vbo, const char* text, f
 void cleanup_font_alt(void);
 
 // #endif // MODULE_FONT_H
+
+
+
+/*
+// refs
+typedef struct {
+    GLuint texture;
+    stbtt_bakedchar* cdata;
+    int bitmap_w, bitmap_h;
+} FontData;
+
+render_text(&font_data, text_program, text_vao, text_vbo, text, 25.0f, 150.0f, ww, hh, 1.0f, 1.0f, 1.0f, 1.0f);
+*/
