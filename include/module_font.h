@@ -1,3 +1,4 @@
+// module_font.h
 #pragma once
 
 // #ifndef MODULE_FONT_H
@@ -7,6 +8,8 @@
 
 // Opaque pointer to FontData
 typedef struct FontData FontData;
+
+int init_font_shaders_and_buffers(GLuint* program, GLuint* vao, GLuint* vbo);
 
 // Functions using FontData
 int init_font(const char* font_path, float font_size, float scale, FontData** font_data);

@@ -1,3 +1,4 @@
+// module_font.c
 #include "module_font.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,9 +150,8 @@ void cleanup_font_alt(void) {
     }
 }
 
-// text shader ?
 // Initialize shaders and VAO/VBO
-int init_shaders_and_buffers(GLuint* program, GLuint* vao, GLuint* vbo) {
+int init_font_shaders_and_buffers(GLuint* program, GLuint* vao, GLuint* vbo) {
     const char* vs_src =
         "#version 330 core\n"
         "layout(location = 0) in vec2 position;\n"

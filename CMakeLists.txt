@@ -182,7 +182,7 @@ set(APP_NAME sdl3_test)
 set(SRC_FILES
     # Add other .c files here if necessary
     src/gl.c                    # glad 2.0.8
-    # src/module_font.c           # font
+    src/module_font.c           # font
 
 )
 
@@ -196,6 +196,9 @@ add_executable(${APP_NAME}
     # src/sdl3_cimgui.c
     # src/sdl3_cimgui_font.c
 
+
+    src/main.c
+
     #opengl
     
     # examples/sdl3_glad_font.c
@@ -206,7 +209,7 @@ add_executable(${APP_NAME}
     # src/sdl3_glad_font_cube04.c
     # src/sdl3_glad_cimgui_font.c
     # src/sdl3_glad_cimgui.c
-    src/sdl3_glad_cimgui02.c
+    # src/sdl3_glad_cimgui02.c
 )
 
 # SDL3 

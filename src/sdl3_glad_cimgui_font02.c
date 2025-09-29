@@ -126,15 +126,6 @@ int main() {
     }
     printf("OpenGL loaded: version %s\n", glGetString(GL_VERSION));
 
-    // Initialize font
-    // FontData font_data = {0};
-    // if (!init_font("resources/Kenney Mini.ttf", 32.0f, main_scale, &font_data)) {
-    //     SDL_GL_DestroyContext(gl_context);
-    //     SDL_DestroyWindow(window);
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
     FontData *font_data = NULL;
     if (!init_font("resources/Kenney Mini.ttf", 32.0f, main_scale, &font_data)) {
         SDL_GL_DestroyContext(gl_context);

@@ -1,7 +1,14 @@
+// main.c
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_opengl.h>
+#include <glad/gl.h>
+
 #include <cimgui.h>
 #include <cimgui_impl.h>
+
+#include "module_font.h"
 
 #define igGetIO igGetIO_Nil
 
@@ -13,7 +20,7 @@ int main() {
 
     float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_OPENGL;
-    SDL_Window* window = SDL_CreateWindow("Dear cImGui SDL3+OpenGL3 example", (int)(1280 * main_scale), (int)(720 * main_scale), window_flags);
+    SDL_Window* window = SDL_CreateWindow("SDL3 cImGui Glad", (int)(1280 * main_scale), (int)(720 * main_scale), window_flags);
     if (!window) {
         printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
         return -1;
@@ -31,6 +38,18 @@ int main() {
         return -1;
     }
     SDL_GL_MakeCurrent(window, gl_context);
+    // Enable vsync
+    SDL_GL_SetSwapInterval(1);
+
+    int version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
+    if (version == 0) {
+        printf("Failed to initialize GLAD\n");
+        SDL_GL_DestroyContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    printf("OpenGL loaded: version %s\n", glGetString(GL_VERSION));
 
     // Setup Dear ImGui context
     igCreateContext(NULL);
@@ -46,6 +65,28 @@ int main() {
     // Setup Platform/Renderer backends
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330");
+
+
+    FontData *font_data = NULL;
+    if (!init_font("resources/Kenney Mini.ttf", 32.0f, main_scale, &font_data)) {
+        SDL_GL_DestroyContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
+    // Initialize shaders and buffers
+    GLuint program, vao, vbo;
+    if (!init_font_shaders_and_buffers(&program, &vao, &vbo)) {
+        cleanup_font(font_data);
+        SDL_GL_DestroyContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Our state
     bool show_demo_window = true;
@@ -107,17 +148,28 @@ int main() {
             igEnd();
         }
 
-        // Rendering
+        // end imgui Rendering
         igRender();
-        
-        glViewport(0, 0, (int)io->DisplaySize.x, (int)io->DisplaySize.y);
+
+        int ww, hh;
+        SDL_GetWindowSize(window, &ww, &hh);
+        glViewport(0, 0, ww, hh);
+        // glViewport(0, 0, (int)io->DisplaySize.x, (int)io->DisplaySize.y);
+
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // render 2d text
+        render_text(font_data, program, vao, vbo, "Hello, World!", 100.0f, 100.0f, 800, 600, 1.0f, 1.0f, 1.0f, 1.0f);
+
+
         ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
         SDL_GL_SwapWindow(window);
     }
 
     // Cleanup
+    cleanup_font(font_data); // conflict due cimgui modified font match data type.
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     igDestroyContext(NULL);
