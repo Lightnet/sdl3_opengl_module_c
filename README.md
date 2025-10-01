@@ -27,10 +27,10 @@
  - Work toward keep it simple as possible for testing the shaders.
  - font loading using the stb_truetype.
  - cimgui loading for create widget for debugging.
- - quad 2d
- - 3d cube with texture pixel nearest and no light
- - lua
- - flecs
+ - quad 2d 
+ - 3d cube with texture pixel nearest and no light (wip)
+ - lua (wip)
+ - flecs (wip)
  - transform 3d hierarchy (wip)
 
 # Reason for c programing language:

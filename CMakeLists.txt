@@ -203,7 +203,13 @@ add_executable(${APP_NAME}
     # src/sdl3_glad_cimgui_transformer3d02.c
     # src/sdl3_glad_cimgui_transformer3d03.c
     # src/sdl3_glad_cimgui_transformer3d04.c
-    src/sdl3_glad_cimgui_transformer3d05.c
+    # src/sdl3_glad_cimgui_transformer3d05.c
+    # src/sdl3_glad_cimgui_transformer3d07.c # working
+    # src/sdl3_glad_cimgui_transformer3d08.c
+    # src/sdl3_glad_cimgui_transformer3d09.c
+    # src/sdl3_glad_cimgui_transformer3d10.c
+    # src/sdl3_glad_cimgui_transformer3d12.c
+    src/sdl3_glad_cimgui_transformer3d13.c
     # src/main.c
 
     #opengl
