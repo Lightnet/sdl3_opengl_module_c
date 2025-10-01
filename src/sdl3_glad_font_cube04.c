@@ -486,6 +486,12 @@ int main() {
         SDL_GL_SwapWindow(window);
     }
 
+
+    //clean up
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    igDestroyContext(NULL);
+
     cleanup_font(&font_data);
     cleanup_cube(&cube_data);
     glDeleteProgram(text_program);

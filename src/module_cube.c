@@ -154,7 +154,6 @@ int init_cube(const char* texture_path, CubeData* cube_data) {
     return 1;
 }
 
-
 // Render cube with CGLM matrices
 void render_cube(CubeData* cube_data, GLuint program, vec3 rotation, int ww, int hh) {
     glUseProgram(program);
@@ -180,5 +179,4 @@ void render_cube(CubeData* cube_data, GLuint program, vec3 rotation, int ww, int
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
-
 

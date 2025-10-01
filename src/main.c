@@ -9,10 +9,12 @@
 #include <cimgui_impl.h>
 #include "module_font.h"
 #include "module_cube.h" // Added for cube functionality
+#include "module_lua.h" // Added for Lua module
+#include "module_flecs.h" // Added for Flecs module
 
 #define igGetIO igGetIO_Nil
 
-int main() {
+int main(int argc, char* argv[]) {
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
         fprintf(stderr, "Failed to init video! %s\n", SDL_GetError());
         return 1;
@@ -75,6 +77,26 @@ int main() {
         return -1;
     }
 
+    // Initialize Lua
+    LuaData lua_data = {0};
+    if (!module_init_lua("resources/script.lua", argc, argv, &lua_data)) {
+        cleanup_font(font_data);
+        SDL_GL_DestroyContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
+    FlecsData flecs_data = {0};
+    if (!module_init_flecs(&flecs_data)) {
+        module_cleanup_lua(&lua_data);
+        cleanup_font(font_data);
+        SDL_GL_DestroyContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
     // Initialize font shaders and buffers
     GLuint text_program, text_vao, text_vbo;
     if (!init_font_shaders_and_buffers(&text_program, &text_vao, &text_vbo)) {
@@ -118,6 +140,8 @@ int main() {
     bool show_another_window = false;
     ImVec4 clear_color = {0.45f, 0.55f, 0.60f, 1.00f};
     float rotation[3] = {0.0f, 0.0f, 0.0f}; // Cube rotation angles
+    Uint64 last_time = SDL_GetTicks();
+
 
     // Main loop
     bool done = false;
@@ -135,6 +159,17 @@ int main() {
             SDL_Delay(10);
             continue;
         }
+
+        // Calculate delta time
+        Uint64 current_time = SDL_GetTicks();
+        float dt = (current_time - last_time) / 1000.0f; // Convert to seconds
+        last_time = current_time;
+
+        // Call Lua update
+        module_update_lua(&lua_data, dt);
+
+        // Call Flecs update (progresses phases and runs systems)
+        module_update_flecs(&flecs_data, dt);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -200,6 +235,11 @@ int main() {
     }
 
     // Cleanup
+
+    module_cleanup_flecs(&flecs_data); // Added Flecs cleanup
+    module_cleanup_lua(&lua_data); // Clean up Lua
+
+
     // Clean up cube resources
     glDeleteTextures(1, &cube_data.texture);
     glDeleteVertexArrays(1, &cube_data.vao);
@@ -207,6 +247,7 @@ int main() {
     glDeleteProgram(cube_program);
 
     cleanup_font(font_data);
+    
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();

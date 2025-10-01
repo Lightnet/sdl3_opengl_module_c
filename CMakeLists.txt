@@ -78,65 +78,65 @@ target_link_libraries(custom_cimgui PUBLIC
     SDL3::SDL3
 )
 
-# #================================================
-# # Lua
-# #================================================
-# FetchContent_Declare(
-#     lua
-#     GIT_REPOSITORY https://github.com/lua/lua.git
-#     GIT_TAG v5.4.8
-#     GIT_SHALLOW TRUE
-# )
-# FetchContent_MakeAvailable(lua)
-# # Lua doesn't have a CMake build, so we manually compile it
-# # List Lua source files (core and libraries, excluding lua.c and luac.c)
-# set(LUA_SRC
-#     ${lua_SOURCE_DIR}/lapi.c
-#     ${lua_SOURCE_DIR}/lauxlib.c
-#     ${lua_SOURCE_DIR}/lbaselib.c
-#     ${lua_SOURCE_DIR}/lcode.c
-#     ${lua_SOURCE_DIR}/lcorolib.c
-#     ${lua_SOURCE_DIR}/lctype.c
-#     ${lua_SOURCE_DIR}/ldblib.c
-#     ${lua_SOURCE_DIR}/ldebug.c
-#     ${lua_SOURCE_DIR}/ldo.c
-#     ${lua_SOURCE_DIR}/ldump.c
-#     ${lua_SOURCE_DIR}/lfunc.c
-#     ${lua_SOURCE_DIR}/lgc.c
-#     ${lua_SOURCE_DIR}/linit.c
-#     ${lua_SOURCE_DIR}/liolib.c
-#     ${lua_SOURCE_DIR}/llex.c
-#     ${lua_SOURCE_DIR}/lmathlib.c
-#     ${lua_SOURCE_DIR}/lmem.c
-#     ${lua_SOURCE_DIR}/loadlib.c
-#     ${lua_SOURCE_DIR}/lobject.c
-#     ${lua_SOURCE_DIR}/lopcodes.c
-#     ${lua_SOURCE_DIR}/loslib.c
-#     ${lua_SOURCE_DIR}/lparser.c
-#     ${lua_SOURCE_DIR}/lstate.c
-#     ${lua_SOURCE_DIR}/lstring.c
-#     ${lua_SOURCE_DIR}/lstrlib.c
-#     ${lua_SOURCE_DIR}/ltable.c
-#     ${lua_SOURCE_DIR}/ltablib.c
-#     ${lua_SOURCE_DIR}/ltm.c
-#     ${lua_SOURCE_DIR}/lundump.c
-#     ${lua_SOURCE_DIR}/lvm.c
-#     ${lua_SOURCE_DIR}/lzio.c
-#     ${lua_SOURCE_DIR}/lutf8lib.c
-# )
-# # Create a static Lua library
-# add_library(lua STATIC ${LUA_SRC})
-# target_include_directories(lua PUBLIC ${lua_SOURCE_DIR})
 #================================================
+# Lua
+#================================================
+FetchContent_Declare(
+    lua
+    GIT_REPOSITORY https://github.com/lua/lua.git
+    GIT_TAG v5.4.8
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(lua)
+# Lua doesn't have a CMake build, so we manually compile it
+# List Lua source files (core and libraries, excluding lua.c and luac.c)
+set(LUA_SRC
+    ${lua_SOURCE_DIR}/lapi.c
+    ${lua_SOURCE_DIR}/lauxlib.c
+    ${lua_SOURCE_DIR}/lbaselib.c
+    ${lua_SOURCE_DIR}/lcode.c
+    ${lua_SOURCE_DIR}/lcorolib.c
+    ${lua_SOURCE_DIR}/lctype.c
+    ${lua_SOURCE_DIR}/ldblib.c
+    ${lua_SOURCE_DIR}/ldebug.c
+    ${lua_SOURCE_DIR}/ldo.c
+    ${lua_SOURCE_DIR}/ldump.c
+    ${lua_SOURCE_DIR}/lfunc.c
+    ${lua_SOURCE_DIR}/lgc.c
+    ${lua_SOURCE_DIR}/linit.c
+    ${lua_SOURCE_DIR}/liolib.c
+    ${lua_SOURCE_DIR}/llex.c
+    ${lua_SOURCE_DIR}/lmathlib.c
+    ${lua_SOURCE_DIR}/lmem.c
+    ${lua_SOURCE_DIR}/loadlib.c
+    ${lua_SOURCE_DIR}/lobject.c
+    ${lua_SOURCE_DIR}/lopcodes.c
+    ${lua_SOURCE_DIR}/loslib.c
+    ${lua_SOURCE_DIR}/lparser.c
+    ${lua_SOURCE_DIR}/lstate.c
+    ${lua_SOURCE_DIR}/lstring.c
+    ${lua_SOURCE_DIR}/lstrlib.c
+    ${lua_SOURCE_DIR}/ltable.c
+    ${lua_SOURCE_DIR}/ltablib.c
+    ${lua_SOURCE_DIR}/ltm.c
+    ${lua_SOURCE_DIR}/lundump.c
+    ${lua_SOURCE_DIR}/lvm.c
+    ${lua_SOURCE_DIR}/lzio.c
+    ${lua_SOURCE_DIR}/lutf8lib.c
+)
+# Create a static Lua library
+add_library(lua STATIC ${LUA_SRC})
+target_include_directories(lua PUBLIC ${lua_SOURCE_DIR})
+# ================================================
 # flecs
-#================================================
-# FetchContent_Declare(
-#     flecs
-#     GIT_REPOSITORY https://github.com/SanderMertens/flecs.git
-#     GIT_TAG v4.1.1
-#     GIT_SHALLOW TRUE
-# )
-# FetchContent_MakeAvailable(flecs)
+# ================================================
+FetchContent_Declare(
+    flecs
+    GIT_REPOSITORY https://github.com/SanderMertens/flecs.git
+    GIT_TAG v4.1.1
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(flecs)
 
 #================================================
 # ENET
@@ -184,6 +184,8 @@ set(SRC_FILES
     src/gl.c                    # glad 2.0.8
     src/module_font.c           # font
     src/module_cube.c           # font
+    src/module_lua.c
+    src/module_flecs.c
 )
 
 message(STATUS "cimgui_SOURCE_DIR: >> ${cimgui_SOURCE_DIR}")
@@ -197,7 +199,12 @@ add_executable(${APP_NAME}
     # src/sdl3_cimgui_font.c
 
 
-    src/main.c
+    # src/sdl3_glad_cimgui_transformer3d.c
+    # src/sdl3_glad_cimgui_transformer3d02.c
+    # src/sdl3_glad_cimgui_transformer3d03.c
+    # src/sdl3_glad_cimgui_transformer3d04.c
+    src/sdl3_glad_cimgui_transformer3d05.c
+    # src/main.c
 
     #opengl
     
@@ -215,7 +222,8 @@ add_executable(${APP_NAME}
 # SDL3 
 target_link_libraries(${APP_NAME} PUBLIC SDL3::SDL3) # SDL 3.2.22
 target_link_libraries(${APP_NAME} PRIVATE custom_cimgui) # custom cimgui
-# target_link_libraries(${APP_NAME} PRIVATE cimgui) # does not work. need to config to work.
+target_link_libraries(${APP_NAME} PRIVATE lua) # lua
+target_link_libraries(${APP_NAME} PRIVATE flecs) # flecs
 
 # Include directories
 target_include_directories(${APP_NAME} PUBLIC
@@ -226,6 +234,7 @@ target_include_directories(${APP_NAME} PUBLIC
     ${cimgui_SOURCE_DIR}/imgui/backends     # imgui/backends
     ${SDL3_SOURCE_DIR}/include              # SDL 3.2.22
     ${stb_SOURCE_DIR}                       # stb
+    ${lua_SOURCE_DIR}                       # lua
 )
 
 # for c #define

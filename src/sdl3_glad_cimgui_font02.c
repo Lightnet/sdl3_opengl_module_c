@@ -175,7 +175,7 @@ int main() {
 
         // Render text
         // render_text(&font_data, program, vao, vbo, text, 25.0f, 150.0f, ww, hh, 1.0f, 1.0f, 1.0f, 1.0f);// test
-        render_text(font_data, program, vao, vbo, "Hello, World!", 100.0f, 100.0f, 800, 600, 1.0f, 1.0f, 1.0f, 1.0f);
+        render_text(font_data, program, vao, vbo, "Hello, World!", 100.0f, 100.0f, ww, hh, 1.0f, 1.0f, 1.0f, 1.0f);
 
         SDL_GL_SwapWindow(window);
     }

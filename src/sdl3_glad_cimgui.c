@@ -334,7 +334,10 @@ int main() {
     }
 
     // Cleanup
-    // cleanup_font(&font_data);
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    igDestroyContext(NULL);
+    
     glDeleteProgram(program);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
